@@ -1,0 +1,21 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<p>AI를 쓰면서 당연하다고 여겼던 것들을 직접 실험해서 확인하고 있습니다.</p>
+			<p><a href="/blog">글 목록</a> · <a href="/about">소개</a></p>
+		</main>
+		<Footer />
+	</body>
+</html>
