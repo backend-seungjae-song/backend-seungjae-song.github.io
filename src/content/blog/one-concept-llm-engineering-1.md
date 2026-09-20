@@ -3,6 +3,8 @@ title: "빈칸으로 이해하는 LLM 엔지니어링 (1)"
 description: "앞에 주어진 말은 AI의 답에 어떤 영향을 줄까요. 빈칸 예시로 시작해 프롬프트, 컨텍스트, 하네스가 각각 무엇을 가리키는지 설명합니다."
 pubDate: 2026-09-13
 updatedDate: 2026-09-21
+seriesOrder: 1
+seriesLabel: "입력 · 앞말에 따라 달라지는 답"
 ---
 
 빈칸을 하나 드리겠습니다.
@@ -20,7 +22,20 @@ updatedDate: 2026-09-21
 "한여름 땡볕에 걷다가, 시원한 ___."
 "한겨울 눈길을 걷다가, 따뜻한 ___."
 
+<figure>
+  <img src="/images/series/seasons.webp" alt="여름 풍경 앞의 얼음물과 아이스커피, 겨울 창가의 따뜻한 차와 국물" width="1440" height="960" loading="lazy" />
+  <figcaption>계절과 온도를 다르게 적으면 떠올리는 음료나 음식도 달라질 수 있습니다. 문장 예시를 설명하기 위해 생성한 삽화입니다.</figcaption>
+</figure>
+
 빈칸 앞의 계절에 따라 떠오르는 말이 달라질 수 있습니다. "한여름"과 "한겨울"이 뒤에 올 말에 영향을 줍니다.
+
+<figure>
+  <picture>
+    <source media="(max-width: 540px)" srcset="/images/series/01-same-blank-different-context-mobile.svg" width="360" height="456" />
+    <img src="/images/series/01-same-blank-different-context.svg" alt="여름 문장에는 물이나 아이스커피, 겨울 문장에는 차나 국물을 떠올리는 예시" width="720" height="288" loading="lazy" />
+  </picture>
+  <figcaption>같은 빈칸이어도 앞에 적은 상황에 따라 떠올리는 답이 달라질 수 있습니다. 실제 AI 응답을 측정한 결과는 아닙니다.</figcaption>
+</figure>
 
 AI에 입력하는 질문이나 지시를 "프롬프트"라고 부릅니다. 목적과 필요한 정보를 적어 주면 원하는 답을 얻는 데 도움이 될 수 있습니다. 실제로 답이 좋아졌는지는 결과를 비교해 확인해야 합니다.
 
@@ -42,7 +57,9 @@ AI에 정보를 전달하고 도구를 실행하며 작업 상태와 결과를 �
 
 ## 다음 글부터
 
-다음 글부터는 AI에 지시와 자료를 전달하고, 도구를 사용하게 한 뒤 결과를 확인하는 일을 차례로 다루겠습니다. 조건을 바꾼 뒤 결과를 비교하고, 확인하지 못한 부분은 그대로 밝히겠습니다. 다음 글에서는 프롬프트를 다룹니다.
+2화에서는 지시를 바꾼 실험, 3화에서는 질문과 함께 전달한 자료, 4화에서는 실행과 결과 확인을 다룹니다. 각 글에 실제로 비교한 조건과 결과, 확인하지 못한 부분을 함께 적었습니다.
+
+[2화: 프롬프트로 이동하기](/blog/one-concept-llm-engineering-2/)
 
 ## 참고 자료
 
