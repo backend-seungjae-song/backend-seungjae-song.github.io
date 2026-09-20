@@ -16,7 +16,17 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			<p>AI를 쓰면서 당연하다고 여겼던 것들을 직접 실험해서 확인하고 있습니다.</p>
 			<p>커머스 백엔드와 AI 영상 제작 시스템을 개발합니다.<br />여러 코딩 에이전트를 쓰는 데 필요한 macOS 앱을 만들어 사용하고 있습니다.</p>
 			<p><a href="/blog">글 목록</a> · <a href="/about">소개</a></p>
+			<section aria-labelledby="series-title" class="series">
+				<h2 id="series-title">빈칸으로 이해하는 LLM 엔지니어링</h2>
+				<p>지시를 쓰고 자료를 고르며 결과를 확인하기까지, 직접 해 본 실험을 네 편에 담았습니다.</p>
+				<a href="/blog/one-concept-llm-engineering-1/">1화부터 읽기</a>
+			</section>
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<style>
+	.series { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid rgb(var(--gray-light)); }
+	.series h2 { font-size: 1.5rem; line-height: 1.45; word-break: keep-all; }
+</style>
