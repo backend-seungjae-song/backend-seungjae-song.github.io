@@ -1,14 +1,15 @@
 :root {
   color-scheme: light;
-  --bg: #fcfcfb;
-  --surface: #f1f2f0;
+  --bg: #faf9f6;
+  --surface: #f0efea;
   --ink: #202622;
   --muted: #626963;
-  --line: #dce0da;
+  --line: #deded6;
   --accent: #375f49;
   --accent-soft: #eaf0e9;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --page-width: 1120px;
+  --font-editorial: 'Iowan Old Style', 'AppleMyungjo', 'Batang', serif;
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
