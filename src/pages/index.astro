@@ -12,9 +12,9 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
     <Header />
     <main id="main">
       <section class="intro entry">
-        <h1>AI 도구를 만들고<br />실험합니다</h1>
-        <p>AI를 쓰면서 당연하다고 여겼던 것들을<br class="desktop-break" /> 직접 실험해서 확인하고 있습니다.</p>
-        <a class="text-link" href="/about">송승재 소개</a>
+        <div><p class="intro-label">소프트웨어 엔지니어 송승재</p><h1>필요한 도구를 만들고<br />결과를 확인합니다</h1></div>
+        <div class="intro-copy"><p>커머스 백엔드와 영상 제작 자동화를 개발합니다.<br class="desktop-break" /> AI 개발 환경 Iris를 만들어 사용하며 공개하고 있습니다.</p>
+        <a class="text-link" href="/about">송승재 소개</a></div>
       </section>
       <section class="series-feature entry entry-later" aria-labelledby="series-title">
         <a class="cover" href="/blog/one-concept-llm-engineering-1/" aria-label="빈칸으로 이해하는 LLM 엔지니어링 1화 읽기"><img src="/images/series/seasons.webp" alt="여름의 찬 음료와 겨울의 따뜻한 음료를 나란히 그린 삽화" width="1440" height="960" fetchpriority="high" /></a>
@@ -26,17 +26,26 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
   </body>
 </html>
 <style>
-  .intro { max-width: 780px; margin-bottom: 60px; }
-  .intro h1 { font-size: clamp(36px, 4.2vw, 54px); line-height: 1.25; letter-spacing: -.055em; margin-bottom: 24px; }
-  .intro p { font-size: 17px; color: var(--muted); margin-bottom: 12px; line-height: 1.8; }
-  .series-feature { display: grid; grid-template-columns: 1.15fr 1fr; background: var(--surface); border-radius: 8px; overflow: hidden; }
-  .cover { display: block; overflow: hidden; }
-  .cover img { height: 100%; width: 100%; object-fit: cover; }
-  .feature-copy { padding: 38px 40px; align-self: center; }
-  .feature-copy .meta { margin-bottom: 16px; }
-  .feature-copy h2 { font-size: 30px; line-height: 1.4; margin-bottom: 18px; }
-  .feature-copy > p:not(.meta) { color: var(--muted); font-size: 15px; margin-bottom: 14px; max-width: 350px; }
-  .all-posts { margin: 76px 0 0; }
-  .all-posts > h2 { font-size: 19px; margin-bottom: 24px; }
-  @media(max-width:767px) { .intro { margin-bottom: 40px; } .intro h1 { font-size: 36px; } .intro p { font-size: 16px; } .desktop-break { display: none; } .series-feature { grid-template-columns: 1fr; } .cover img { aspect-ratio: 3/2; } .feature-copy { padding: 28px; } .feature-copy h2 { font-size: 27px; } .all-posts { margin-top: 48px; } }
+  .intro { display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; align-items: end; padding: 16px 0 56px; }
+  .intro h1 { font-family: var(--font-editorial); font-size: clamp(36px, 3.6vw, 46px); font-weight: 500; line-height: 1.45; letter-spacing: -.055em; }
+  .intro .intro-label { font-size: 12px; letter-spacing: .02em; margin-bottom: 20px; }
+  .intro-copy { padding: 0 0 5px 16px; }
+  .intro p { font-size: 16px; color: var(--muted); margin-bottom: 16px; line-height: 1.9; }
+  .series-feature { display: grid; grid-template-columns: 1.15fr 1fr; gap: 64px; border-block: 1px solid var(--line); padding: 32px 0; }
+  .cover { display: block; overflow: hidden; border-radius: 3px; }
+  .cover img { height: 100%; width: 100%; object-fit: cover; aspect-ratio: 4/3; transition: transform 450ms var(--ease-out); }
+  .feature-copy { padding: 20px 0 20px 16px; align-self: center; }
+  .feature-copy .meta { margin-bottom: 24px; font-size: 12px; }
+  .feature-copy h2 { font-family: var(--font-editorial); font-size: 32px; font-weight: 500; line-height: 1.5; margin-bottom: 20px; }
+  .feature-copy > p:not(.meta) { color: var(--muted); font-size: 15px; margin-bottom: 18px; max-width: 330px; }
+  .all-posts { margin: 64px 0 0; display: grid; grid-template-columns: 200px minmax(0,1fr); gap: 48px; }
+  .all-posts > h2 { font-size: 14px; font-weight: 500; padding-top: 28px; }
+  @media(hover:hover) and (pointer:fine) { .cover:hover img { transform: scale(1.025); } }
+  @media(max-width:900px) { .intro, .series-feature { gap: 32px; } .intro-copy, .feature-copy { padding-left: 0; } .all-posts { grid-template-columns: 140px minmax(0,1fr); gap: 32px; } }
+  @media(max-width:767px) {
+    .intro { grid-template-columns: 1fr; gap: 24px; padding: 0 0 32px; } .intro h1 { font-size: 34px; } .intro p { font-size: 15px; margin-bottom: 8px; } .desktop-break { display: none; }
+    .series-feature { grid-template-columns: 1fr; gap: 24px; padding: 24px 0; } .cover img { aspect-ratio: 3/2; }
+    .feature-copy { padding: 0; } .feature-copy .meta { margin-bottom: 12px; } .feature-copy h2 { font-size: 28px; margin-bottom: 16px; }
+    .all-posts { margin-top: 40px; display: block; } .all-posts > h2 { padding-top: 0; margin-bottom: 20px; }
+  }
 </style>

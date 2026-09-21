@@ -4,11 +4,21 @@ interface Props { current?: number; }
 const { current } = Astro.props;
 const posts = (await getCollection('blog')).filter(post => post.data.seriesOrder !== undefined).sort((a, b) => a.data.seriesOrder! - b.data.seriesOrder!);
 ---
-<nav aria-label="LLM 엔지니어링 시리즈" class="series-nav"><p>이 시리즈</p><ol>{posts.map(post => <li><a href={`/blog/${post.id}/`} aria-current={current === post.data.seriesOrder ? 'page' : undefined}><span>{post.data.seriesOrder}화</span><span>{post.data.seriesLabel?.split(' · ')[0]}</span></a></li>)}</ol></nav>
+<nav aria-label="시리즈 전체 글" class="series-nav">
+  <div class="series-heading"><p>시리즈</p><h2><a href="/blog">빈칸으로 이해하는 LLM 엔지니어링</a></h2></div>
+  <ol>{posts.map(post => <li><a href={`/blog/${post.id}/`} aria-current={current === post.data.seriesOrder ? 'page' : undefined}><span class="part">{post.data.seriesOrder}화</span><span class="subject">{post.data.seriesLabel?.split(' · ')[1]}</span>{current === post.data.seriesOrder && <span class="current">현재 글</span>}</a></li>)}</ol>
+</nav>
 <style>
-  p { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+  .series-nav { display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; }
+  .series-heading p { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+  h2 { max-width: 280px; font-size: 22px; font-weight: 500; font-family: var(--font-editorial); line-height: 1.6; }
+  h2 a { text-decoration: none; }
   ol { list-style: none; margin: 0; padding: 0; }
-  a { display: flex; gap: 14px; padding: 10px 12px; margin-left: -12px; min-height: 44px; text-decoration: none; font-size: 13px; color: var(--muted); border-radius: 4px; }
-  a[aria-current='page'] { background: var(--accent-soft); color: var(--accent); font-weight: 650; }
-  a:hover { color: var(--accent); }
+  li + li { border-top: 1px solid var(--line); }
+  li a { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; min-height: 48px; text-decoration: none; font-size: 14px; }
+  .part { color: var(--muted); font-size: 12px; flex-shrink: 0; }
+  .current { color: var(--accent); font-size: 11px; margin-left: auto; flex-shrink: 0; }
+  a[aria-current='page'] .subject { color: var(--accent); font-weight: 650; }
+  a:hover .subject { text-decoration: underline; text-underline-offset: 5px; }
+  @media(max-width:767px) { .series-nav { grid-template-columns: 1fr; gap: 24px; } h2 { max-width: none; font-size: 20px; } }
 </style>

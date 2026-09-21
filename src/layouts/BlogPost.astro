@@ -27,7 +27,7 @@ const sections = headings.filter(h => h.depth === 2);
     {seriesOrder && <p class="article-meta"><span>{seriesLabel?.split(' · ')[0]}</span><FormattedDate date={pubDate} />{updatedDate && <span>수정 <FormattedDate date={updatedDate} /></span>}</p>}
   </header>
   <div class="article-grid">
-    {seriesOrder && <aside class="article-sidebar"><details class="contents" open><summary>목차와 시리즈</summary><div class="sidebar-inner"><SeriesNav current={seriesOrder} />{sections.length > 0 && <nav aria-label="이 글의 목차" class="toc"><p>이 글에서</p><ol>{sections.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></nav>}</div></details></aside>}
+    {seriesOrder && sections.length > 0 && <aside class="article-sidebar"><details class="contents" open><summary>목차</summary><nav aria-label="현재 글의 목차" class="toc"><p class="toc-title">목차</p><ol>{sections.map((h, i) => <li><a href={`#${h.slug}`}><span class="section-number" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span><span>{h.text}</span></a></li>)}</ol></nav></details></aside>}
     <script is:inline>
       {
         const contents = document.querySelector('.contents');
@@ -43,28 +43,50 @@ const sections = headings.filter(h => h.depth === 2);
       {seriesOrder && <nav class="adjacent-posts" aria-label="이전 글과 다음 글">{prev ? <a href={`/blog/${prev.id}/`}><span>이전 글</span><strong>{prev.data.seriesLabel?.split(' · ')[1]}</strong></a> : <a href="/blog"><span>시리즈</span><strong>전체 글 보기</strong></a>}{next ? <a href={`/blog/${next.id}/`}><span>다음 글</span><strong>{next.data.seriesLabel?.split(' · ')[1]}</strong></a> : <a href="/blog"><span>4부작 마침</span><strong>전체 글 보기</strong></a>}</nav>}
     </article>
   </div>
+  {seriesOrder && <div class="series-bottom"><SeriesNav current={seriesOrder} /></div>}
 </main>
 <Footer />
-
+<script>
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
+  const sections = links.map(link => document.getElementById(decodeURIComponent(link.hash.slice(1)))).filter((section): section is HTMLElement => section !== null);
+  if (sections.length) {
+    let scheduled = false;
+    const updateCurrent = () => {
+      const current = [...sections].reverse().find(section => section.getBoundingClientRect().top <= 140) ?? sections[0];
+      links.forEach(link => {
+        if (decodeURIComponent(link.hash.slice(1)) === current.id) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+      scheduled = false;
+    };
+    addEventListener('scroll', () => {
+      if (!scheduled) { requestAnimationFrame(updateCurrent); scheduled = true; }
+    }, { passive: true });
+    updateCurrent();
+  }
+</script>
 </body>
 </html>
 <style>
   .article-page { max-width: 1040px; padding-top: 52px; }
-  .article-header { margin-left: 280px; max-width: 680px; margin-bottom: 44px; }
+  .article-header { margin-left: 0; max-width: 680px; margin-bottom: 44px; }
   .series-name { font-size: 13px; color: var(--muted); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px 16px; }
   .series-name a { text-decoration: none; }
-  h1 { font-size: clamp(32px, 3.6vw, 44px); line-height: 1.3; margin-bottom: 20px; }
+  h1 { font-family: var(--font-editorial); font-weight: 500; font-size: clamp(34px, 3.6vw, 46px); line-height: 1.4; margin-bottom: 20px; }
   .article-deck { font-size: 17px; color: var(--muted); line-height: 1.75; margin-bottom: 24px; }
   .article-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 12px; color: var(--muted); }
-  .article-grid { display: grid; grid-template-columns: 208px minmax(0,680px); gap: 72px; align-items: start; }
-  .article-sidebar { position: sticky; top: 28px; max-height: calc(100dvh - 56px); overflow-y: auto; padding: 0 12px; margin-left: -12px; }
+  .article-grid { display: grid; grid-template-columns: minmax(0,680px) 224px; gap: 72px; align-items: start; }
+  .article-sidebar { grid-column: 2; grid-row: 1; position: sticky; top: 28px; max-height: calc(100dvh - 56px); overflow-y: auto; padding: 0 12px; margin-left: -12px; }
   summary { display: none; }
-  .toc { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
-  .toc p { font-size: 12px; margin-bottom: 10px; color: var(--muted); }
+  .toc { border-left: 1px solid var(--line); padding-left: 24px; }
+  .toc-title { color: var(--ink); font-size: 13px; font-weight: 650; margin: 0 0 16px; }
   .toc ol { list-style: none; padding: 0; margin: 0; }
-  .toc a { display: block; font-size: 12px; line-height: 1.7; text-decoration: none; padding: 7px 0; color: var(--muted); }
-  .toc a:hover { color: var(--accent); }
-  .prose { font-size: 17px; line-height: 1.95; min-width: 0; }
+  .toc a { display: grid; grid-template-columns: 20px 1fr; gap: 8px; font-size: 12px; line-height: 1.7; text-decoration: none; padding: 10px 0; color: var(--muted); transition: color 160ms var(--ease-out); }
+  .section-number { font-variant-numeric: tabular-nums; font-size: 10px; padding-top: 2px; }
+  .toc a[aria-current='location'] { color: var(--accent); font-weight: 650; }
+  .toc a:hover { color: var(--ink); }
+  .series-bottom { margin-top: 72px; border-top: 1px solid var(--line); padding-top: 32px; }
+  .prose { grid-column: 1; grid-row: 1; font-size: 17px; line-height: 1.95; min-width: 0; }
   .prose :global(p) { margin: 0 0 1.5em; word-break: keep-all; }
   .prose :global(h2) { font-size: 25px; margin: 56px 0 20px; scroll-margin-top: 32px; }
   .prose :global(h3) { font-size: 21px; margin: 32px 0 16px; }
@@ -89,7 +111,22 @@ const sections = headings.filter(h => h.depth === 2);
   .standalone { max-width: 760px; }
   .standalone .article-header { margin-left: 0; }
   .standalone .article-grid { display: block; }
-  @media(max-width:1100px) { .article-grid { grid-template-columns: 180px minmax(0,680px); gap: 48px; } .article-header { margin-left: 228px; } }
-  @media(max-width:900px) { .article-header { margin-left: 0; margin-bottom: 28px; } .article-grid { display: block; } .article-sidebar { position: static; max-height: none; padding: 0; margin: 0 0 32px; } .contents { border-block: 1px solid var(--line); } summary { display: list-item; cursor: pointer; font-size: 13px; color: var(--muted); min-height: 48px; padding: 12px 0; } .sidebar-inner { padding: 20px 12px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; } .toc { border: 0; padding: 0; margin: 0; } }
-  @media(max-width:540px) { .article-page { padding-top: 32px; } .article-deck { font-size: 16px; } .article-meta { font-size: 11px; } .prose { font-size: 16px; line-height: 1.95; } .prose :global(h2) { font-size: 23px; margin-top: 40px; } .prose :global(th), .prose :global(td) { padding: 10px 7px; } .prose :global(table) { font-size: 12px; } .sidebar-inner { grid-template-columns: 1fr; } .adjacent-posts { gap: 20px; } .adjacent-posts strong { font-size: 14px; } }
+  @media(max-width:1100px) { .article-grid { grid-template-columns: minmax(0,680px) 200px; gap: 40px; } }
+  @media(max-width:900px) {
+    .article-header { margin-bottom: 28px; }
+    .article-grid { display: block; }
+    .article-sidebar { position: static; max-height: none; padding: 0; margin: 0 0 32px; }
+    .contents { border-block: 1px solid var(--line); }
+    summary { display: list-item; cursor: pointer; font-size: 14px; color: var(--ink); min-height: 48px; padding: 12px 0; }
+    .toc { border: 0; padding: 0 0 16px; }
+    .toc-title { display: none; }
+    .toc a { font-size: 13px; min-height: 44px; }
+  }
+  @media(max-width:540px) {
+    .article-page { padding-top: 32px; } .article-deck { font-size: 16px; } .article-meta { font-size: 11px; }
+    .prose { font-size: 16px; line-height: 1.95; } .prose :global(h2) { font-size: 23px; margin-top: 40px; }
+    .prose :global(th), .prose :global(td) { padding: 10px 7px; } .prose :global(table) { font-size: 12px; }
+    .adjacent-posts { gap: 20px; } .adjacent-posts strong { font-size: 14px; }
+    .series-bottom { margin-top: 48px; padding-top: 24px; }
+  }
 </style>
