@@ -1,102 +1,95 @@
 ---
 import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
+import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
 import SeriesNav from '../components/SeriesNav.astro';
-
-type Props = CollectionEntry<'blog'>['data'];
-
-const { title, description, pubDate, updatedDate, heroImage, seriesOrder, seriesLabel } = Astro.props;
+type Props = CollectionEntry<'blog'>['data'] & { headings?: {depth: number; slug: string; text: string}[] };
+const { title, description, pubDate, updatedDate, heroImage, seriesOrder, seriesLabel, headings = [] } = Astro.props;
+const heading = seriesLabel?.split(' · ')[1] ?? title;
+const posts = (await getCollection('blog')).filter(post => post.data.seriesOrder).sort((a, b) => a.data.seriesOrder! - b.data.seriesOrder!);
+const next = posts.find(post => post.data.seriesOrder === (seriesOrder ?? 0) + 1);
+const prev = posts.find(post => post.data.seriesOrder === (seriesOrder ?? 0) - 1);
+const sections = headings.filter(h => h.depth === 2);
 ---
-
+<!doctype html>
 <html lang="ko">
-	<head>
-		<BaseHead title={title} description={description} />
-		<style>
-			main {
-				width: calc(100% - 2em);
-				max-width: 100%;
-				margin: 0;
-			}
-			.hero-image {
-				width: 100%;
-			}
-			.hero-image img {
-				display: block;
-				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
-			}
-			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
-			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-				font-size: clamp(1.9rem, 5vw, 2.8rem);
-				word-break: keep-all;
-				line-height: 1.35;
-			}
-			.topic { font-size: 1.15rem; margin: 0.5rem 0 1rem; }
-			.prose :global(h2) { margin-top: 2.5rem; font-size: 1.55rem; line-height: 1.45; word-break: keep-all; }
-			.prose :global(figure) { margin: 2rem 0; }
-			.prose :global(figure img) { display: block; width: 100%; border-radius: 4px; }
-			.prose :global(figcaption) { margin-top: 0.75rem; font-size: 0.85rem; line-height: 1.65; color: rgb(var(--gray-dark)); }
-			.prose :global(blockquote) { font-size: 1rem; padding: 0.75rem 1rem; background: #f5f5f5; }
-			.prose :global(blockquote p) { margin: 0.5rem 0; }
-			.prose :global(table) { border-collapse: collapse; font-size: 0.9rem; }
-			.prose :global(th), .prose :global(td) { padding: 0.7rem 0.5rem; border-bottom: 1px solid rgb(var(--gray-light)); text-align: left; }
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
-				font-style: italic;
-			}
-		</style>
-	</head>
+<head><BaseHead title={title} description={description} /></head>
+<body>
+<Header />
+<main id="main" class:list={['article-page', { 'standalone': !seriesOrder }]}>
+  <header class="article-header entry">
+    {seriesOrder && <p class="series-name"><a href="/blog">빈칸으로 이해하는 LLM 엔지니어링</a><span>{seriesOrder}화</span></p>}
+    <h1>{heading}</h1>
+    {seriesLabel && <p class="article-deck">{description}</p>}
+    {seriesOrder && <p class="article-meta"><span>{seriesLabel?.split(' · ')[0]}</span><FormattedDate date={pubDate} />{updatedDate && <span>수정 <FormattedDate date={updatedDate} /></span>}</p>}
+  </header>
+  <div class="article-grid">
+    {seriesOrder && <aside class="article-sidebar"><details class="contents" open><summary>목차와 시리즈</summary><div class="sidebar-inner"><SeriesNav current={seriesOrder} />{sections.length > 0 && <nav aria-label="이 글의 목차" class="toc"><p>이 글에서</p><ol>{sections.map(h => <li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></nav>}</div></details></aside>}
+    <script is:inline>
+      {
+        const contents = document.querySelector('.contents');
+        const media = matchMedia('(max-width: 900px)');
+        const resizeContents = () => { if (contents) contents.open = !media.matches; };
+        resizeContents();
+        media.addEventListener('change', resizeContents);
+      }
+    </script>
+    <article class="prose">
+      {heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+      <slot />
+      {seriesOrder && <nav class="adjacent-posts" aria-label="이전 글과 다음 글">{prev ? <a href={`/blog/${prev.id}/`}><span>이전 글</span><strong>{prev.data.seriesLabel?.split(' · ')[1]}</strong></a> : <a href="/blog"><span>시리즈</span><strong>전체 글 보기</strong></a>}{next ? <a href={`/blog/${next.id}/`}><span>다음 글</span><strong>{next.data.seriesLabel?.split(' · ')[1]}</strong></a> : <a href="/blog"><span>4부작 마침</span><strong>전체 글 보기</strong></a>}</nav>}
+    </article>
+  </div>
+</main>
+<Footer />
 
-	<body>
-		<Header />
-		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="last-updated-on">
-										수정 <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1>{title}</h1>
-						{seriesLabel && <p class="topic">{seriesLabel}</p>}
-						{!seriesOrder && <hr />}
-					</div>
-					{seriesOrder && <SeriesNav current={seriesOrder} />}
-					<slot />
-					{seriesOrder && <SeriesNav current={seriesOrder} />}
-				</div>
-			</article>
-		</main>
-		<Footer />
-	</body>
+</body>
 </html>
+<style>
+  .article-page { max-width: 1040px; padding-top: 52px; }
+  .article-header { margin-left: 280px; max-width: 680px; margin-bottom: 44px; }
+  .series-name { font-size: 13px; color: var(--muted); margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px 16px; }
+  .series-name a { text-decoration: none; }
+  h1 { font-size: clamp(32px, 3.6vw, 44px); line-height: 1.3; margin-bottom: 20px; }
+  .article-deck { font-size: 17px; color: var(--muted); line-height: 1.75; margin-bottom: 24px; }
+  .article-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 12px; color: var(--muted); }
+  .article-grid { display: grid; grid-template-columns: 208px minmax(0,680px); gap: 72px; align-items: start; }
+  .article-sidebar { position: sticky; top: 28px; max-height: calc(100dvh - 56px); overflow-y: auto; padding: 0 12px; margin-left: -12px; }
+  summary { display: none; }
+  .toc { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .toc p { font-size: 12px; margin-bottom: 10px; color: var(--muted); }
+  .toc ol { list-style: none; padding: 0; margin: 0; }
+  .toc a { display: block; font-size: 12px; line-height: 1.7; text-decoration: none; padding: 7px 0; color: var(--muted); }
+  .toc a:hover { color: var(--accent); }
+  .prose { font-size: 17px; line-height: 1.95; min-width: 0; }
+  .prose :global(p) { margin: 0 0 1.5em; word-break: keep-all; }
+  .prose :global(h2) { font-size: 25px; margin: 56px 0 20px; scroll-margin-top: 32px; }
+  .prose :global(h3) { font-size: 21px; margin: 32px 0 16px; }
+  .prose :global(a) { color: var(--accent); }
+  .prose :global(figure) { margin: 36px 0; }
+  .prose :global(figure img) { width: 100%; border-radius: 6px; }
+  .prose :global(figcaption) { margin-top: 12px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+  .prose :global(blockquote) { margin: 28px 0; padding: 18px 24px; background: var(--surface); border-left: 2px solid var(--accent); border-radius: 0 4px 4px 0; }
+  .prose :global(blockquote p) { margin: 0; }
+  .prose :global(table) { border-collapse: collapse; width: 100%; font-size: 14px; font-variant-numeric: tabular-nums; margin: 28px 0; }
+  .prose :global(th) { background: var(--surface); font-weight: 600; }
+  .prose :global(th), .prose :global(td) { padding: 13px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+  .prose :global(ul), .prose :global(ol) { padding-left: 24px; margin: 20px 0 28px; }
+  .prose :global(li) { padding-left: 4px; margin-bottom: 10px; }
+  .prose :global(details) { padding: 18px 20px; background: var(--surface); border-radius: 6px; font-size: 14px; margin: 28px 0; }
+  .prose :global(details summary) { display: list-item; cursor: pointer; font-weight: 600; }
+  .prose :global(details[open] summary) { margin-bottom: 16px; }
+  .adjacent-posts { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .adjacent-posts a { text-decoration: none; display: flex; flex-direction: column; gap: 8px; }
+  .adjacent-posts span { color: var(--muted); font-size: 12px; }
+  .adjacent-posts strong { font-size: 16px; font-weight: 600; }
+  .standalone { max-width: 760px; }
+  .standalone .article-header { margin-left: 0; }
+  .standalone .article-grid { display: block; }
+  @media(max-width:1100px) { .article-grid { grid-template-columns: 180px minmax(0,680px); gap: 48px; } .article-header { margin-left: 228px; } }
+  @media(max-width:900px) { .article-header { margin-left: 0; margin-bottom: 28px; } .article-grid { display: block; } .article-sidebar { position: static; max-height: none; padding: 0; margin: 0 0 32px; } .contents { border-block: 1px solid var(--line); } summary { display: list-item; cursor: pointer; font-size: 13px; color: var(--muted); min-height: 48px; padding: 12px 0; } .sidebar-inner { padding: 20px 12px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; } .toc { border: 0; padding: 0; margin: 0; } }
+  @media(max-width:540px) { .article-page { padding-top: 32px; } .article-deck { font-size: 16px; } .article-meta { font-size: 11px; } .prose { font-size: 16px; line-height: 1.95; } .prose :global(h2) { font-size: 23px; margin-top: 40px; } .prose :global(th), .prose :global(td) { padding: 10px 7px; } .prose :global(table) { font-size: 12px; } .sidebar-inner { grid-template-columns: 1fr; } .adjacent-posts { gap: 20px; } .adjacent-posts strong { font-size: 14px; } }
+</style>

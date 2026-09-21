@@ -1,39 +1,33 @@
 ---
-const today = new Date();
+const year = new Date().getFullYear();
 ---
-
-<footer>
-	&copy; {today.getFullYear()} 송승재
-	<div class="social-links">
-		<a href="https://github.com/backend-seungjae-song" target="_blank">
-			<span class="sr-only">GitHub</span>
-			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32"
-					><path
-						fill="currentColor"
-						d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
-					></path></svg
-				>
-		</a>
-	</div>
+<footer class="site-footer">
+  <p>© {year} 송승재</p>
+  <div class="footer-links"><a href="https://github.com/backend-seungjae-song">GitHub</a><a href="/rss.xml">RSS</a></div>
+  <div class="preferences" hidden><button id="theme-toggle" type="button">어두운 화면</button><button id="motion-toggle" type="button" aria-pressed="true">모션 켜짐</button></div>
 </footer>
+<script>
+  const root = document.documentElement;
+  const theme = document.querySelector<HTMLButtonElement>('#theme-toggle');
+  const motion = document.querySelector<HTMLButtonElement>('#motion-toggle');
+  function updateLabels() {
+    const dark = root.dataset.theme === 'dark';
+    const moving = root.dataset.motion !== 'off';
+    if (theme) { theme.textContent = dark ? '밝은 화면' : '어두운 화면'; }
+    if (motion) { motion.textContent = moving ? '모션 켜짐' : '모션 꺼짐'; motion.setAttribute('aria-pressed', String(moving)); }
+  }
+  function save(key: string, value: string) { try { localStorage.setItem(key, value); } catch {} }
+  theme?.addEventListener('click', () => { root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; save('site-theme', root.dataset.theme); updateLabels(); });
+  motion?.addEventListener('click', () => { root.dataset.motion = root.dataset.motion === 'off' ? 'on' : 'off'; save('site-motion', root.dataset.motion); updateLabels(); });
+  updateLabels();
+  const preferences = document.querySelector<HTMLElement>('.preferences');
+  if (preferences) preferences.hidden = false;
+</script>
 <style>
-	footer {
-		padding: 2em 1em 6em 1em;
-		background: linear-gradient(var(--gray-gradient)) no-repeat;
-		color: rgb(var(--gray));
-		text-align: center;
-	}
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 1em;
-		margin-top: 1em;
-	}
-	.social-links a {
-		text-decoration: none;
-		color: rgb(var(--gray));
-	}
-	.social-links a:hover {
-		color: rgb(var(--gray-dark));
-	}
+  .site-footer { width: min(var(--page-width), calc(100% - 96px)); margin: auto; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 32px; padding: 24px 0 36px; color: var(--muted); font-size: 12px; }
+  .preferences[hidden] { display: none; }
+  p { margin: 0; } .footer-links, .preferences { display: flex; align-items: center; gap: 20px; } .preferences { margin-left: auto; gap: 16px; }
+  a { text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; }
+  button { background: none; color: inherit; border: none; padding: 0; min-height: 44px; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+  @media(max-width:767px) { .site-footer { width: calc(100% - 40px); flex-wrap: wrap; gap: 0 24px; } .preferences { width: 100%; margin: 0; } }
 </style>
