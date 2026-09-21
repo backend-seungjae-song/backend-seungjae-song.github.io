@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+const posts = (await getCollection('blog')).sort((a, b) => (a.data.seriesOrder ?? Infinity) - (b.data.seriesOrder ?? Infinity) || b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<ol class="post-list">
+  {posts.map(post => <li><a href={`/blog/${post.id}/`}>
+    <span class="part">{post.data.seriesOrder ? `${post.data.seriesOrder}화` : '글'}</span>
+    <div class="post-copy"><h3>{post.data.seriesLabel?.split(' · ')[1] ?? post.data.title}</h3><p>{post.data.description}</p><span class="meta">{post.data.seriesLabel?.split(' · ')[0]} <span class="date"><FormattedDate date={post.data.pubDate} /></span></span></div>
+    <span class="arrow" aria-hidden="true">↗</span>
+  </a></li>)}
+</ol>
+<style>
+  ol { list-style: none; padding: 0; margin: 0; }
+  li { border-top: 1px solid var(--line); }
+  a { display: grid; grid-template-columns: 52px 1fr 24px; gap: 24px; padding: 30px 0; text-decoration: none; }
+  .part { font-size: 13px; color: var(--muted); padding-top: 5px; font-variant-numeric: tabular-nums; }
+  h3 { font-size: 24px; margin-bottom: 10px; }
+  p { margin: 0 0 16px; max-width: 680px; font-size: 15px; color: var(--muted); line-height: 1.7; word-break: keep-all; }
+  .date { margin-left: 16px; }
+  .arrow { padding-top: 2px; font-size: 23px; transition: transform 160ms var(--ease-out); }
+  @media(hover:hover) and (pointer:fine) { a:hover .arrow { transform: translate(3px, -3px); } }
+  @media(max-width:767px) { a { grid-template-columns: 32px 1fr 20px; gap: 12px; padding: 24px 0; } h3 { font-size: 21px; } p { font-size: 14px; } .date { display: block; margin: 5px 0 0; } }
+</style>
